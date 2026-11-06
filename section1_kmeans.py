@@ -10,9 +10,6 @@ import math
 import os
 import random
 
-import matplotlib
-
-matplotlib.use("Agg")  # les figures sont sauvegardees dans des fichiers
 import matplotlib.pyplot as plt
 
 FIG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "figures")
@@ -158,6 +155,8 @@ def kmeans(data, k, centroides_initiaux=None, noms=None, prefixe_figures=None,
 
 
 if __name__ == "__main__":
+    plt.switch_backend("Agg")  # ici les figures sont seulement sauvegardees
+
     data1 = [[1], [2], [18], [20], [31]]
 
     print("=== Exercice 1 : centroides initiaux [[1], [2], [18]] ===")
