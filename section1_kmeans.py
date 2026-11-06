@@ -7,6 +7,7 @@ par exemple [1] en 1D ou [-2, 3] en 2D.
 """
 
 import math
+import random
 
 
 def distance_carree(p, q):
@@ -60,3 +61,53 @@ def calculer_sse(clusters, centroides):
         for x in cluster:
             sse += distance_carree(x, c)
     return sse
+
+
+def kmeans(data, k, centroides_initiaux=None):
+    """Algorithme k-means.
+
+    data               : liste de points (meme dimension pour tous)
+    k                  : nombre de clusters
+    centroides_initiaux: liste de k points ; si None, on tire au hasard
+                         k points distincts du jeu de donnees
+
+    Affiche les resultats intermediaires et retourne l'erreur SSE.
+    """
+    if centroides_initiaux is None:
+        centroides = random.sample(data, k)
+    else:
+        centroides = centroides_initiaux
+    if len(centroides) != k:
+        raise ValueError("Il faut exactement k centroides initiaux")
+
+    clusters_precedents = None
+    iteration = 1
+    while True:
+        clusters = affecter_points(data, centroides)
+        print("Iteration", iteration)
+        for c, cluster in zip(centroides, clusters):
+            print("Centroid", c, " Points", cluster)
+        # Critere d'arret : l'affectation des points n'a pas change,
+        # donc les centroides ne changeraient plus non plus.
+        if clusters == clusters_precedents:
+            break
+        clusters_precedents = clusters
+        centroides = calculer_centroides(clusters, centroides)
+        iteration += 1
+
+    sse = calculer_sse(clusters, centroides)
+    print("Fin clustering, erreur = ", sse)
+    return sse
+
+
+if __name__ == "__main__":
+    data1 = [[1], [2], [18], [20], [31]]
+
+    print("=== Exercice 1 : centroides initiaux [[1], [2], [18]] ===")
+    kmeans(data1, 3, [[1], [2], [18]])
+
+    print("\n=== Exercice 1 : centroides initiaux [[18], [20], [31]] ===")
+    kmeans(data1, 3, [[18], [20], [31]])
+
+    print("\n=== Exercice 1 : centroides initiaux tires au hasard ===")
+    kmeans(data1, 3)
