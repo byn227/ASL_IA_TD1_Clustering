@@ -1,17 +1,4 @@
 #!/usr/bin/env python3
-"""TD Clustering - Section 1 : clustering k-means.
-
-Implementation de k-means sans bibliotheque externe, pour des points de
-dimension quelconque. Un point est represente par une liste de nombres,
-par exemple [1] en 1D ou [-2, 3] en 2D.
-
-Usage :
-    .venv/bin/python section1_kmeans.py
-Affiche les resultats des Exercices 1 a 3 et sauvegarde les figures de
-l'Exercice 3 dans figures/ex3_init_M1_M2_iter<i>.png et
-figures/ex3_init_M4_M6_iter<i>.png.
-"""
-
 import math
 import os
 import random
@@ -25,29 +12,23 @@ COULEURS = ["red", "blue", "orange", "green", "purple", "brown", "pink", "gray"]
 
 
 def distance_carree(p, q):
-    """Carre de la distance euclidienne : somme_i (p_i - q_i)^2."""
     if len(p) != len(q):
         raise ValueError("Les deux points doivent avoir la meme dimension")
     return sum((a - b) ** 2 for a, b in zip(p, q))
 
 
 def distance_euclidienne(p, q):
-    """Distance euclidienne entre deux points p et q de meme dimension :
-    d(p, q) = racine( somme_i (p_i - q_i)^2 )."""
     return math.sqrt(distance_carree(p, q))
 
 
 def centroide_le_plus_proche(point, centroides):
-    """Indice du centroide le plus proche de point.
-    En cas d'egalite, on garde le premier (indice le plus petit)."""
+    """Indice du centroide le plus proche (en cas d'egalite, le premier)."""
     distances = [distance_euclidienne(point, c) for c in centroides]
     return distances.index(min(distances))
 
 
 def affecter_points(data, centroides):
-    """Affecte chaque point au centroide le plus proche.
-    Retourne une liste de k clusters : clusters[j] contient les points
-    affectes au centroide j, dans l'ordre du jeu de donnees."""
+    """clusters[j] = points dont le centroide le plus proche est j."""
     clusters = [[] for _ in centroides]
     for point in data:
         clusters[centroide_le_plus_proche(point, centroides)].append(point)
@@ -55,9 +36,7 @@ def affecter_points(data, centroides):
 
 
 def calculer_centroides(clusters, anciens_centroides):
-    """Nouveau centroide de chaque cluster = moyenne de ses points,
-    coordonnee par coordonnee.
-    Si un cluster est vide, on garde son ancien centroide."""
+    """Moyenne de chaque cluster ; un cluster vide garde son ancien centroide."""
     nouveaux = []
     for cluster, ancien in zip(clusters, anciens_centroides):
         if len(cluster) == 0:
@@ -68,8 +47,6 @@ def calculer_centroides(clusters, anciens_centroides):
 
 
 def calculer_sse(clusters, centroides):
-    """Erreur SSE = somme, sur tous les clusters, des carres des distances
-    entre chaque point et le centroide de son cluster."""
     sse = 0
     for cluster, c in zip(clusters, centroides):
         for x in cluster:
@@ -78,9 +55,7 @@ def calculer_sse(clusters, centroides):
 
 
 def dessiner_iteration(data, noms, centroides, titre, fichier):
-    """Figure 2D d'une iteration de k-means, sauvegardee dans fichier.
-    Les points sont des 'o' annotes avec leur nom, les centroides des 'x' ;
-    un cluster et son centroide ont la meme couleur."""
+    """Figure d'une iteration : points 'o' annotes, centroides 'x', une couleur par cluster."""
     fig, ax = plt.subplots(figsize=(5, 5))
     for i, point in enumerate(data):
         # meme regle que affecter_points : le point prend la couleur
@@ -108,21 +83,12 @@ def dessiner_iteration(data, noms, centroides, titre, fichier):
 
 def kmeans(data, k, centroides_initiaux=None, noms=None, prefixe_figures=None,
            retourner_clusters=False):
-    """Algorithme k-means.
+    """Affiche chaque iteration et retourne la SSE.
 
-    data               : liste de points (meme dimension pour tous)
-    k                  : nombre de clusters
-    centroides_initiaux: liste de k points ; si None, on tire au hasard
-                         k points distincts du jeu de donnees
-    noms               : (optionnel) noms des points, dans le meme ordre que
-                         data, pour etiqueter les points sur les figures
-    prefixe_figures    : (optionnel, donnees 2D) si different de None, la
-                         figure de l'iteration i est sauvegardee dans
-                         <prefixe_figures>_iter<i>.png
-    retourner_clusters : (optionnel) si True, retourne (SSE, clusters finaux)
-                         au lieu de la SSE seule
-
-    Affiche les resultats intermediaires et retourne l'erreur SSE.
+    centroides_initiaux : si None, k points de data tires au hasard
+    noms                : noms des points, pour les figures
+    prefixe_figures     : si donne (2D), figures dans <prefixe>_iter<i>.png
+    retourner_clusters  : si True, retourne (SSE, clusters)
     """
     if centroides_initiaux is None:
         centroides = random.sample(data, k)

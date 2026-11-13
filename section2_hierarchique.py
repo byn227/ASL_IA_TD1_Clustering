@@ -1,12 +1,4 @@
 #!/usr/bin/env python3
-"""TD Clustering - Section 2 : clustering hierarchique avec SciPy.
-
-Usage :
-    .venv/bin/python section2_hierarchique.py
-Les figures sont sauvegardees dans figures/s2_distance.png et
-figures/s2_similarite.png.
-"""
-
 import os
 
 import numpy as np
@@ -18,25 +10,18 @@ FIG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "figures")
 
 
 def dendrogramme(donnees, labels, methode, ax, orientation="top"):
-    """Clustering hierarchique (methode = "single" ou "complete") et
-    dendrogramme dessine sur ax. Retourne la matrice de linkage.
-
-    donnees : soit une matrice de distance au format compact 1D (valeurs
-              au-dessus de la diagonale), soit une liste de points ;
-              hierarchy.linkage accepte les deux formats."""
+    """donnees : distances au format compact 1D ou liste de points (linkage accepte les deux)."""
     Z = hierarchy.linkage(donnees, method=methode)
     hierarchy.dendrogram(Z, labels=labels, orientation=orientation, ax=ax)
     return Z
 
 
 def similarite_vers_distance(sim):
-    """distance(pi, pj) = 1 - similarite(pi, pj)."""
     return 1 - np.array(sim)
 
 
 def figure_single_complete(donnees, labels, titre, fichier):
-    """Dendrogrammes single link et complete link cote a cote (comme dans
-    l'enonce), sauvegardes dans fichier. Affiche les fusions successives."""
+    """Single link et complete link cote a cote ; affiche les fusions."""
     fig, axes = plt.subplots(1, 2, figsize=(10, 4))
     for ax, methode in zip(axes, ["single", "complete"]):
         Z = dendrogramme(donnees, labels, methode, ax)

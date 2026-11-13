@@ -1,14 +1,3 @@
-#!/usr/bin/env python3
-"""TD Clustering - Section 1 : verifications utilisees dans le compte rendu.
-
-Ce script recalcule les chiffres cites dans le compte rendu pour les
-Exercices 1 et 2 (comparaison avec l'affichage de l'enonce, tirages
-aleatoires, recherche de l'optimum global).
-
-Usage :
-    .venv/bin/python section1_verifications.py
-"""
-
 import contextlib
 import io
 import itertools
@@ -46,8 +35,7 @@ Fin clustering, erreur =  2.5
 
 
 def kmeans_silencieux(data, k, centroides_initiaux=None):
-    """Lance kmeans sans afficher les iterations.
-    Retourne (affichage, SSE, clusters finaux)."""
+    """Retourne (affichage, SSE, clusters) sans rien afficher."""
     sortie = io.StringIO()
     with contextlib.redirect_stdout(sortie):
         sse, clusters = kmeans(data, k, centroides_initiaux, retourner_clusters=True)
@@ -55,12 +43,11 @@ def kmeans_silencieux(data, k, centroides_initiaux=None):
 
 
 def sse_partition(clusters):
-    """SSE d'une partition donnee (chaque centroide = moyenne de son cluster)."""
+    """SSE d'une partition, centroides = moyennes des clusters."""
     return calculer_sse(clusters, calculer_centroides(clusters, [None] * len(clusters)))
 
 
 if __name__ == "__main__":
-    # ---------------------------------------------------------------- Exercice 1
     data1 = [[1], [2], [18], [20], [31]]
     print("=== Exercice 1 : comparaison avec l'affichage de l'enonce ===")
     for init, attendu in [([[1], [2], [18]], ATTENDU_INIT_1_2_18),
@@ -82,7 +69,6 @@ if __name__ == "__main__":
         _, sse, _ = kmeans_silencieux(data1, 3, list(init))
         print(f"  init {list(init)} : SSE = {sse}")
 
-    # ---------------------------------------------------------------- Exercice 2
     data2 = [[2], [4], [6], [12], [24], [30]]
     print("\n=== Exercice 2 : les 5 coupures en 2 intervalles (optimum en 1D) ===")
     for i in range(1, len(data2)):

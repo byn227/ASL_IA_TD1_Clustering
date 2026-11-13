@@ -1,10 +1,4 @@
 #!/usr/bin/env python3
-"""TD Clustering - Section 1, Exercice 4 : comparaison avec SciKit-Learn.
-
-Usage :
-    .venv/bin/python section1_sklearn.py
-"""
-
 import contextlib
 import io
 import math
@@ -16,14 +10,12 @@ from section1_kmeans import kmeans
 
 
 def kmeans_sklearn(data, k, centroides_initiaux):
-    """k-means de SciKit-Learn a partir des centroides initiaux donnes.
-    n_init=1 : une seule execution, a partir de ces centroides."""
+    """n_init=1 : une seule execution, a partir des centroides donnes."""
     return KMeans(n_clusters=k, n_init=1, init=array(centroides_initiaux)).fit(data)
 
 
 def labels_vers_clusters(data, labels, k):
-    """Regroupe les points selon leur label : clusters[j] contient les points
-    de label j, dans l'ordre du jeu de donnees (meme format que notre code)."""
+    """labels_ -> liste de clusters, meme format que notre kmeans."""
     clusters = [[] for _ in range(k)]
     for point, label in zip(data, labels):
         clusters[label].append(point)
@@ -31,8 +23,7 @@ def labels_vers_clusters(data, labels, k):
 
 
 def memes_clusters(clusters_a, clusters_b):
-    """Vrai si les deux clusterings regroupent les memes points, quel que soit
-    le numero des clusters (on compare les partitions, pas les labels)."""
+    """Compare les partitions, quel que soit le numero des clusters."""
     def forme_canonique(clusters):
         return sorted(tuple(tuple(point) for point in cluster) for cluster in clusters)
     return forme_canonique(clusters_a) == forme_canonique(clusters_b)
@@ -48,7 +39,6 @@ if __name__ == "__main__":
     print(KMeans(n_clusters=3, n_init=1, init=array([[1], [2], [18]])).fit(data1).labels_)
     print(KMeans(n_clusters=3, n_init=1, init=array([[18], [20], [31]])).fit(data1).labels_)
 
-    # Comparaison automatique notre code / SciKit-Learn
     tests = [
         ("Ex1, init [1],[2],[18]", data1, 3, [[1], [2], [18]]),
         ("Ex1, init [18],[20],[31]", data1, 3, [[18], [20], [31]]),
