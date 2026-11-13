@@ -4,6 +4,12 @@
 Implementation de k-means sans bibliotheque externe, pour des points de
 dimension quelconque. Un point est represente par une liste de nombres,
 par exemple [1] en 1D ou [-2, 3] en 2D.
+
+Usage :
+    .venv/bin/python section1_kmeans.py
+Affiche les resultats des Exercices 1 a 3 et sauvegarde les figures de
+l'Exercice 3 dans figures/ex3_init_M1_M2_iter<i>.png et
+figures/ex3_init_M4_M6_iter<i>.png.
 """
 
 import math

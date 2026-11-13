@@ -1,29 +1,74 @@
+#!/usr/bin/env python3
+"""TD Clustering - Section 2 : clustering hierarchique avec SciPy.
+
+Usage :
+    .venv/bin/python section2_hierarchique.py
+Les figures sont sauvegardees dans figures/s2_distance.png et
+figures/s2_similarite.png.
+"""
+
+import os
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.cluster import hierarchy
 from scipy.spatial.distance import squareform
 
-labels = ["p1", "p2", "p3", "p4", "p5"]
+FIG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "figures")
 
-# 1) Matrice de distance
-dist1 = [0.1, 0.9, 0.35, 0.8, 0.3, 0.4, 0.5, 0.6, 0.7, 0.2]
 
-# 2) Matrice de similarite -> distance = 1 - similarite
-sim = np.array([
-    [1.00, 0.10, 0.41, 0.55, 0.35],
-    [0.10, 1.00, 0.64, 0.47, 0.98],
-    [0.41, 0.64, 1.00, 0.44, 0.85],
-    [0.55, 0.47, 0.44, 1.00, 0.76],
-    [0.35, 0.98, 0.85, 0.76, 1.00],
-])
-dist2 = squareform(1 - sim, checks=False)
+def dendrogramme(donnees, labels, methode, ax, orientation="top"):
+    """Clustering hierarchique (methode = "single" ou "complete") et
+    dendrogramme dessine sur ax. Retourne la matrice de linkage.
 
-fig, axes = plt.subplots(2, 2, figsize=(10, 8))
-for i, d in enumerate([dist1, dist2]):
-    for j, method in enumerate(["single", "complete"]):
-        Z = hierarchy.linkage(d, method=method)
-        hierarchy.dendrogram(Z, labels=labels, ax=axes[i, j])
-        axes[i, j].set_title(f"Matrice {i + 1} - {method} link")
+    donnees : soit une matrice de distance au format compact 1D (valeurs
+              au-dessus de la diagonale), soit une liste de points ;
+              hierarchy.linkage accepte les deux formats."""
+    Z = hierarchy.linkage(donnees, method=methode)
+    hierarchy.dendrogram(Z, labels=labels, orientation=orientation, ax=ax)
+    return Z
 
-plt.tight_layout()
-plt.show()
+
+def similarite_vers_distance(sim):
+    """distance(pi, pj) = 1 - similarite(pi, pj)."""
+    return 1 - np.array(sim)
+
+
+def figure_single_complete(donnees, labels, titre, fichier):
+    """Dendrogrammes single link et complete link cote a cote (comme dans
+    l'enonce), sauvegardes dans fichier. Affiche les fusions successives."""
+    fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+    for ax, methode in zip(axes, ["single", "complete"]):
+        Z = dendrogramme(donnees, labels, methode, ax)
+        ax.set_title(f"{methode.capitalize()} link")
+        print(f"  {methode.capitalize()} link - fusions (cluster 1, cluster 2, distance, taille) :")
+        for ligne in Z:
+            print(f"    {int(ligne[0])} {int(ligne[1])} {ligne[2]:.2f} {int(ligne[3])}")
+    fig.suptitle(titre)
+    fig.tight_layout()
+    os.makedirs(FIG_DIR, exist_ok=True)
+    fig.savefig(os.path.join(FIG_DIR, fichier))
+    plt.close(fig)
+
+
+if __name__ == "__main__":
+    plt.switch_backend("Agg")  # ici les figures sont seulement sauvegardees
+    labels = ["p1", "p2", "p3", "p4", "p5"]
+
+    # 1) Matrice de distance, au format compact (valeurs au-dessus de la diagonale)
+    data = [0.1, 0.9, 0.35, 0.8, 0.3, 0.4, 0.5, 0.6, 0.7, 0.2]
+    print("Matrice de distance :", data)
+    figure_single_complete(data, labels, "Matrice de distance", "s2_distance.png")
+
+    # 2) Matrice de similarite -> distance = 1 - similarite
+    sim = [
+        [1.00, 0.10, 0.41, 0.55, 0.35],
+        [0.10, 1.00, 0.64, 0.47, 0.98],
+        [0.41, 0.64, 1.00, 0.44, 0.85],
+        [0.55, 0.47, 0.44, 1.00, 0.76],
+        [0.35, 0.98, 0.85, 0.76, 1.00],
+    ]
+    data_sim = squareform(similarite_vers_distance(sim))
+    print("\nMatrice de similarite convertie en distances :", [round(float(d), 2) for d in data_sim])
+    figure_single_complete(data_sim, labels, "Matrice de similarite (distance = 1 - similarite)",
+                           "s2_similarite.png")
