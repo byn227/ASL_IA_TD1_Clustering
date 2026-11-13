@@ -16,7 +16,7 @@
 \usepackage[hidelinks]{hyperref}
 
 % Les figures sont celles generees par nos scripts
-\graphicspath{{../figures/}}
+\graphicspath{{../figures/}{figures/}}
 
 % Autorise un retour a la ligne apres les _ des noms de fichiers
 \let\underscoreorig\_
@@ -31,9 +31,9 @@
   breaklines=true,
 }
 
-\title{TD Clustering -- Compte rendu}
+\title{TD Clustering - Compte rendu}
 \author{NGUYEN Dinh Huy \and NGUYEN Vinh Tri}
-\date{Data Mining -- INSA Centre Val de Loire -- Novembre 2026}
+\date{Data Mining - INSA Centre Val de Loire - Novembre 2026}
 
 \begin{document}
 
@@ -44,46 +44,34 @@
 \section*{Organisation du rendu et utilisation du code}
 \addcontentsline{toc}{section}{Organisation du rendu et utilisation du code}
 
-L'archive contient :
-\begin{itemize}
-  \item \texttt{section1\_kmeans.py} : notre k-means (Section 1, Exercices 1 à 3) ;
-  \item \texttt{section1\_sklearn.py} : la comparaison avec SciKit-Learn (Section 1, Exercice 4) ;
-  \item \texttt{section1\_verifications.py} : la comparaison de notre affichage avec celui de l'énoncé (Section 1, Exercice 1) ;
-  \item \texttt{section2\_hierarchique.py} : le clustering hiérarchique (Section 2) ;
-  \item \texttt{section3\_etude\_de\_cas.py} : l'étude de cas (Section 3) ;
-  \item \texttt{data/Country-data.csv} : le jeu de données de l'étude de cas ;
-  \item \texttt{figures/} : les figures générées par les scripts ;
-  \item \texttt{requirements.txt}, \texttt{README.md}, et \texttt{rapport/} qui contient ce compte rendu et son source LaTeX.
-\end{itemize}
-
 \paragraph{Installation.} Notre distribution Linux n'autorise pas \texttt{pip install} en dehors d'un environnement virtuel, nous avons donc installé les bibliothèques ainsi :
 \begin{lstlisting}
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 \end{lstlisting}
 
-\paragraph{Exécution.} Depuis la racine du projet :
+\paragraph{Exécution.} Chaque script se lance depuis la racine du projet avec \texttt{.venv/bin/python <script>} :
 \begin{center}
 \begin{tabular}{@{}ll@{}}
   \toprule
-  Commande & Résultat \\
+  Script & Contenu \\
   \midrule
-  \texttt{.venv/bin/python section1\_kmeans.py} & Exercices 1 à 3, figures \texttt{ex3\_*.png} \\
-  \texttt{.venv/bin/python section1\_sklearn.py} & Exercice 4 \\
-  \texttt{.venv/bin/python section1\_verifications.py} & Vérification de l'Exercice 1 \\
-  \texttt{.venv/bin/python section2\_hierarchique.py} & Section 2, figures \texttt{s2\_*.png} \\
-  \texttt{.venv/bin/python section3\_etude\_de\_cas.py} & Section 3, figures \texttt{s3\_*.png} \\
+  \texttt{section1\_kmeans.py} & Section 1, Exercices 1 à 3 (figures \texttt{figures/ex3\_*.png}) \\
+  \texttt{section1\_verifications.py} & Exercice 1 : comparaison de notre affichage avec l'énoncé \\
+  \texttt{section1\_sklearn.py} & Exercice 4 : comparaison avec SciKit-Learn \\
+  \texttt{section2\_hierarchique.py} & Section 2 (figures \texttt{figures/s2\_*.png}) \\
+  \texttt{section3\_etude\_de\_cas.py} & Section 3 (figures \texttt{figures/s3\_*.png}) \\
   \bottomrule
 \end{tabular}
 \end{center}
-Chaque script affiche les résultats cités dans ce compte rendu. Les tirages aléatoires de la Section 3 utilisent une graine fixe, donc les résultats et les figures sont les mêmes à chaque exécution.
+L'archive contient aussi \texttt{data/Country-data.csv}, \texttt{requirements.txt}, les figures (\texttt{figures/}) et le source LaTeX de ce compte rendu (\texttt{rapport.tex}). Chaque script affiche les résultats cités dans ce compte rendu. Les tirages aléatoires de la Section 3 utilisent une graine fixe, donc les résultats et les figures sont les mêmes à chaque exécution.
 
 % ======================================================================
 \section{Clustering k-means}
 
 \subsection{Exercice 1 : implémentation de k-means}
 
-Notre implémentation est dans \texttt{section1\_kmeans.py} et n'utilise que les modules \texttt{math} et \texttt{random} (Matplotlib sert seulement aux figures de l'Exercice 3). Un point est une liste de nombres (\texttt{[1]} en 1D, \texttt{[-2, 3]} en 2D) et tous les calculs se font coordonnée par coordonnée, donc le code marche quelle que soit la dimension.
+Notre implémentation est dans \texttt{section1\_kmeans.py}. Le calcul n'utilise que les modules \texttt{math} et \texttt{random} (Matplotlib sert seulement aux figures de l'Exercice 3). Un point est une liste de nombres (\texttt{[1]} en 1D, \texttt{[-2, 3]} en 2D) et tous les calculs se font coordonnée par coordonnée, donc le code marche quelle que soit la dimension.
 \begin{lstlisting}
 kmeans(data, k, centroides_initiaux=None)
 \end{lstlisting}
@@ -273,13 +261,13 @@ Le code est dans \texttt{section3\_etude\_de\_cas.py}.
 \paragraph{ACP.} La fonction \texttt{preparer\_donnees} reprend le squelette de l'énoncé. Nous avons dû remplacer la ligne \texttt{eigenvectors = eig(R)[1]} par :
 \begin{lstlisting}
 valeurs_propres, eigenvectors = eig(R)
-# 1) R est symetrique reelle : ses valeurs propres sont reelles
+# (1) partie reelle
 assert np.allclose(valeurs_propres.imag, 0) and np.allclose(eigenvectors.imag, 0)
 valeurs_propres, eigenvectors = valeurs_propres.real, eigenvectors.real
-# 2) eig ne trie pas les valeurs propres : ordre decroissant
+# (2) tri par ordre decroissant
 ordre = argsort(valeurs_propres)[::-1]
 valeurs_propres, eigenvectors = valeurs_propres[ordre], eigenvectors[:, ordre]
-# 3) le signe d'un vecteur propre est arbitraire : on prend celui de l'enonce
+# (3) signe de l'enonce
 for c in range(2):
     if matmul(Z[0], eigenvectors[:, c]) * REFERENCE_ENONCE[c] < 0:
         eigenvectors[:, c] = -eigenvectors[:, c]
@@ -371,7 +359,6 @@ Pour comparer avec k-means, le script coupe aussi chaque dendrogramme en 2 puis 
 \end{tabular}
 \end{center}
 
-\clearpage
 \subsubsection*{Interprétation}
 
 \paragraph{Les axes.} Le script affiche la corrélation de chaque variable avec les axes. L'axe X est surtout lié à la mortalité infantile (+0.85), à la fécondité (+0.82), à l'espérance de vie ($-0.87$), au revenu ($-0.81$) et au PIB par habitant ($-0.80$) : il mesure le niveau de développement, les pays pauvres étant à droite. L'axe Y est surtout lié aux importations ($-0.84$) et aux exportations ($-0.76$) en \% du PIB : les pays qui commercent beaucoup avec l'étranger sont en bas.
