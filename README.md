@@ -21,7 +21,7 @@ Depuis la racine du projet :
 |---|---|
 | `.venv/bin/python section1_kmeans.py` | Section 1, Exercices 1 a 3 (figures `figures/ex3_*.png`) |
 | `.venv/bin/python section1_sklearn.py` | Section 1, Exercice 4 (comparaison avec SciKit-Learn) |
-| `.venv/bin/python section1_verifications.py` | Verifications citees dans le compte rendu (Section 1) |
+| `.venv/bin/python section1_verifications.py` | Section 1, Exercice 1 (comparaison de l'affichage avec l'enonce) |
 | `.venv/bin/python section2_hierarchique.py` | Section 2 (figures `figures/s2_*.png`) |
 | `.venv/bin/python section3_etude_de_cas.py` | Section 3 (figures `figures/s3_*.png`) |
 
